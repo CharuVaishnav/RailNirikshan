@@ -44,6 +44,51 @@ class LocationOut(ORM):
     longitude: float
 
 
+# ---- admin screens: users, departments and locations ----------------------
+
+class AdminUserOut(UserOut):
+    """What the admin sees. The email and on/off state are not shown to other users."""
+    email: str | None
+    is_active: bool
+
+
+class UserCreate(BaseModel):
+    username: str
+    password: str
+    full_name: str
+    designation: str = ""
+    email: str | None = None
+    role: str
+    department_id: int | None = None
+
+
+class UserEdit(BaseModel):
+    full_name: str
+    designation: str = ""
+    email: str | None = None
+    role: str
+    department_id: int | None = None
+    is_active: bool = True
+    password: str = ""        # empty = keep the current password
+
+
+class DepartmentCreate(BaseModel):
+    code: str
+    name: str
+
+
+class DepartmentEdit(BaseModel):
+    name: str
+
+
+class LocationIn(BaseModel):
+    name: str
+    kind: str
+    division: str
+    latitude: float
+    longitude: float
+
+
 class InspectionCreate(BaseModel):
     location_id: int
     inspection_type: str

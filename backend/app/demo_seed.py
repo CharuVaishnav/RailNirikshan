@@ -21,7 +21,7 @@ from sqlalchemy import delete, func, select
 
 from . import audit
 from .config import settings
-from .database import Base, SessionLocal, engine
+from .database import SessionLocal
 from .models import AuditLog, ComplianceTask, Department, Inspection, Location, Observation, TaskUpdate, User
 from .seed import seed
 from .services import ai, escalation, storage
@@ -184,8 +184,7 @@ def reset(db) -> None:
 
 
 def demo_seed(do_reset: bool = False) -> None:
-    Base.metadata.create_all(bind=engine)
-    seed()  # departments, users and the base locations (skips itself if already done)
+    seed()  # creates the tables, then departments, users and the base locations (skips itself if already done)
     db = SessionLocal()
     try:
         if do_reset:

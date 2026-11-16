@@ -5,7 +5,7 @@ All demo users have the password: demo123
 """
 from sqlalchemy import select
 
-from .database import Base, SessionLocal, engine
+from .database import SessionLocal, ensure_schema
 from .models import Department, Location, User
 from .security import hash_password
 
@@ -30,7 +30,7 @@ LOCATIONS = [
 
 
 def seed() -> None:
-    Base.metadata.create_all(bind=engine)
+    ensure_schema()
     db = SessionLocal()
     try:
         if db.scalar(select(Department)) is not None:

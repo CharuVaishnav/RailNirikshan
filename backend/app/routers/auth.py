@@ -15,6 +15,8 @@ def login(body: LoginIn, db: Session = Depends(get_db)):
     user = db.scalar(select(User).where(User.username == body.username))
     if user is None or not verify_password(body.password, user.password_hash):
         raise HTTPException(401, "Wrong username or password")
+    if not user.is_active:
+        raise HTTPException(401, "This account is switched off. Ask the administrator.")
     return TokenOut(access_token=create_token(user), role=user.role, full_name=user.full_name)
 
 

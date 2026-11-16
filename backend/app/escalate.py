@@ -5,12 +5,12 @@ Run from the backend folder:  python -m app.escalate
 Windows Task Scheduler can run this every hour (see README.md, "Free email alerts").
 The rules are in services/escalation.py.
 """
-from .database import Base, SessionLocal, engine
+from .database import SessionLocal, ensure_schema
 from .services import escalation
 
 
 def main() -> None:
-    Base.metadata.create_all(bind=engine)
+    ensure_schema()
     db = SessionLocal()
     try:
         result = escalation.run(db)

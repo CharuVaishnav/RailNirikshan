@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api, hasToken, setSession, userName, userRole } from "./api.js";
 import { enrichTasks } from "./format.js";
+import Admin from "./pages/Admin.jsx";
 import FieldApp from "./pages/field/FieldApp.jsx";
 import Login from "./pages/Login.jsx";
 import Overview from "./pages/Overview.jsx";
@@ -11,13 +12,17 @@ const VIEWS = [
   { id: "overview", label: "Overview" },
   { id: "points", label: "Compliance points" },
   { id: "inspections", label: "Inspections" },
+  { id: "admin", label: "Admin", adminOnly: true },   // users, departments and locations
 ];
+
+// The tabs this user may open: the Admin tab is only for the admin account.
+const viewsFor = () => VIEWS.filter((v) => !v.adminOnly || userRole() === "admin");
 
 const NO_FILTER = { status: "review", dept: "", station: "", q: "" };
 
 function viewFromHash() {
   const id = window.location.hash.replace("#/", "");
-  return VIEWS.some((v) => v.id === id) ? id : "overview";
+  return viewsFor().some((v) => v.id === id) ? id : "overview";
 }
 
 export default function App() {
@@ -107,7 +112,7 @@ function Shell({ onLogout }) {
           <span>RailNirikshan</span>
         </button>
         <nav className="nav" aria-label="Sections">
-          {VIEWS.map((v) => (
+          {viewsFor().map((v) => (
             <button key={v.id} type="button" className={`nav-item${view === v.id ? " is-active" : ""}`}
                     aria-current={view === v.id ? "page" : undefined} onClick={() => go(v.id)}>
               {v.label}
@@ -118,7 +123,7 @@ function Shell({ onLogout }) {
           ))}
         </nav>
         <div className="who">
-          <span className="who-name">{userName() || "Senior officer"}</span>
+          <span className="who-name">{userName() || (userRole() === "admin" ? "Administrator" : "Senior officer")}</span>
           <button type="button" className="btn btn-onnavy" onClick={onLogout}>
             Log out
           </button>
@@ -148,6 +153,7 @@ function Shell({ onLogout }) {
           <Inspections inspections={data.inspections} tasks={data.tasks}
                        selectedId={inspectionId} setSelectedId={setInspectionId} openPoints={openPoints} />
         )}
+        {view === "admin" && <Admin notify={notify} onChanged={load} />}
       </main>
 
       <div className={`toast${toast ? " is-shown" : ""}`} role="status" aria-live="polite">

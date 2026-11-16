@@ -333,6 +333,17 @@ select.input { max-width: 230px; }
 .sheet-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
 .panel-head-actions { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
 
+/* ------------------------------------------------------------ admin forms */
+.admin-title { font-size: 22px; line-height: 1.25; font-weight: 700; font-stretch: 90%; }
+.admin-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 20px; align-items: start; }
+.admin-wide { grid-column: 1 / -1; }
+.admin-hint { color: var(--ink-3); font-size: 12.5px; font-weight: 400; }
+.admin-fields .check-row { padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--r-control); }
+.toolbar > .btn { flex: none; }
+@media (max-width: 720px) {
+  .admin-fields { grid-template-columns: minmax(0, 1fr); }
+}
+
 /* ------------------------------------------- field screens (officer and staff) */
 /* one narrow column: a phone screen on a phone, a phone-sized column on a laptop */
 .field-page { display: grid; gap: 16px; max-width: 580px; margin: 0 auto; padding: 22px 16px 80px; }

@@ -70,7 +70,7 @@ def run(db: Session, actor_id: int | None = None, now: datetime | None = None) -
         by_department.setdefault(t.department_id, []).append(t)
     for dept_id, tasks in by_department.items():
         staff = db.scalars(select(User).where(User.role == "staff", User.department_id == dept_id,
-                                              User.email.is_not(None))).all()
+                                              User.is_active, User.email.is_not(None))).all()
         for u in staff:
             emails += notify.send_email(
                 u.email,
@@ -78,7 +78,7 @@ def run(db: Session, actor_id: int | None = None, now: datetime | None = None) -
                 "These inspection points are past their deadline and still open:\n\n"
                 f"{_lines(tasks, now)}\n\nPlease fix them and upload an after-photo in RailNirikshan.")
     if to_senior:
-        for u in db.scalars(select(User).where(User.role == "senior", User.email.is_not(None))).all():
+        for u in db.scalars(select(User).where(User.role == "senior", User.is_active, User.email.is_not(None))).all():
             emails += notify.send_email(
                 u.email,
                 f"RailNirikshan: {len(to_senior)} point(s) overdue by a week or more",

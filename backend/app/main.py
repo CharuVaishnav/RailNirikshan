@@ -4,15 +4,15 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .config import settings
-from .database import Base, engine
-from .routers import auth, dashboard, inspections, tasks
+from .database import engine, ensure_schema
+from .routers import admin, auth, dashboard, inspections, tasks
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     # Creating tables at startup is fine for development.
     # Switch to Alembic migrations once the schema settles.
-    Base.metadata.create_all(bind=engine)
+    ensure_schema()
     yield
 
 
@@ -41,3 +41,4 @@ app.include_router(auth.router)
 app.include_router(inspections.router)
 app.include_router(tasks.router)
 app.include_router(dashboard.router)
+app.include_router(admin.router)

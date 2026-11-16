@@ -1,7 +1,7 @@
 """Database tables for RailNirikshan."""
 from datetime import datetime
 
-from sqlalchemy import JSON, DateTime, Float, ForeignKey, Integer, LargeBinary, String, Text
+from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Integer, LargeBinary, String, Text, true
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .database import Base
@@ -29,6 +29,8 @@ class User(Base):
     role: Mapped[str] = mapped_column(String(20))
     department_id: Mapped[int | None] = mapped_column(ForeignKey("departments.id"), nullable=True)
     password_hash: Mapped[str] = mapped_column(String(200))
+    # The admin switches an account off instead of deleting it, so old inspections keep their names.
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, server_default=true())
     department: Mapped[Department | None] = relationship()
 
 

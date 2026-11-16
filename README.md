@@ -50,7 +50,7 @@ python -m venv .venv
 .venv\Scripts\python -m pip install -r requirements.txt     # Linux/macOS: .venv/bin/python
 copy .env.example .env                                       # Linux/macOS: cp
 .venv\Scripts\python -m app.demo_seed --reset                # users, stations and realistic demo data
-.venv\Scripts\python -m pytest -q                            # should say "6 passed"
+.venv\Scripts\python -m pytest -q                            # should say "7 passed"
 ```
 
 Start it (every time):
@@ -77,7 +77,7 @@ Open http://localhost:5173. The account you sign in with decides which screens o
 | `officer` | Inspecting officer: my inspections, new inspection with checklist, observations, note, approve |
 | `staff_elec`, `staff_engg`, `staff_comm`, `staff_mech`, `staff_snt`, `staff_med`, `staff_sec` | Department staff: the department's points, send a fix with an after-photo |
 | `senior` | Senior officer dashboard: overview, compliance points, inspections |
-| `admin` | Same dashboard as the senior officer |
+| `admin` | The senior officer's dashboard plus an **Admin** tab: users, departments and locations |
 
 ### 3. Test on a real phone
 
@@ -167,7 +167,7 @@ with demo data.
 | Voice to text | Sprint 5 |
 | PDF export of the inspection note, with before / after photos | Working (Hindi text is not printed yet) |
 | Overdue check: escalation in steps, reminder emails | Working; emails need an SMTP account in `backend/.env` |
-| Admin screens for users, departments and locations | Not built; master data comes from the seed scripts |
+| Admin screens: add and change users, departments and locations; switch an account off | Working |
 | Offline mode, repeated-issue finder | Only if time permits |
 
 ## How the AI plugs in

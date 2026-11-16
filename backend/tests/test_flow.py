@@ -195,6 +195,68 @@ def test_overdue_points_are_escalated_once_per_step(monkeypatch):
     assert client.post("/tasks/run-escalation", headers=login("staff_elec")).status_code == 403
 
 
+def test_admin_manages_users_departments_and_locations():
+    admin = login("admin")
+
+    # a new department, and a staff user in it who can sign in
+    dept = client.post("/admin/departments", headers=admin, json={"code": "optg", "name": "Operating"})
+    assert dept.status_code == 201 and dept.json()["code"] == "OPTG"
+    dept_id = dept.json()["id"]
+    assert client.post("/admin/departments", headers=admin, json={"code": "OPTG", "name": "Again"}).status_code == 400
+
+    new_user = {"username": "Staff_Optg", "password": "secret1", "full_name": "Operating Supervisor",
+                "designation": "Supervisor", "email": "optg@example.com", "role": "staff"}
+    assert client.post("/admin/users", headers=admin, json=new_user).status_code == 400      # staff need a department
+    made = client.post("/admin/users", headers=admin, json={**new_user, "department_id": dept_id})
+    assert made.status_code == 201 and made.json()["username"] == "staff_optg" and made.json()["is_active"] is True
+    user_id = made.json()["id"]
+    assert client.post("/admin/users", headers=admin, json={**new_user, "department_id": dept_id}).status_code == 400
+    assert client.post("/admin/users", headers=admin,
+                       json={**new_user, "username": "x2y", "password": "123", "department_id": dept_id}).status_code == 400
+
+    signed_in = client.post("/auth/login", json={"username": "staff_optg", "password": "secret1"})
+    assert signed_in.status_code == 200
+    token = {"Authorization": f"Bearer {signed_in.json()['access_token']}"}
+    assert client.get("/tasks", headers=token).status_code == 200
+
+    # a department with staff cannot be deleted; it can be renamed
+    assert client.delete(f"/admin/departments/{dept_id}", headers=admin).status_code == 400
+    assert client.put(f"/admin/departments/{dept_id}", headers=admin, json={"name": "Operating Dept"}).json()["name"] == "Operating Dept"
+
+    # switching the account off stops the login and the token that was already issued
+    edit = {"full_name": "Operating Supervisor", "designation": "Supervisor", "email": "", "role": "staff",
+            "department_id": dept_id, "is_active": False}
+    off = client.put(f"/admin/users/{user_id}", headers=admin, json=edit)
+    assert off.status_code == 200 and off.json()["is_active"] is False and off.json()["email"] is None
+    assert client.post("/auth/login", json={"username": "staff_optg", "password": "secret1"}).status_code == 401
+    assert client.get("/tasks", headers=token).status_code == 401
+
+    # switched on again with a new password
+    client.put(f"/admin/users/{user_id}", headers=admin, json={**edit, "is_active": True, "password": "newpass9"})
+    assert client.post("/auth/login", json={"username": "staff_optg", "password": "newpass9"}).status_code == 200
+
+    # the admin cannot lock themselves out
+    me = next(u for u in client.get("/admin/users", headers=admin).json() if u["username"] == "admin")
+    own = {"full_name": me["full_name"], "designation": "", "role": "admin", "is_active": False}
+    assert client.put(f"/admin/users/{me['id']}", headers=admin, json=own).status_code == 400
+    assert client.put(f"/admin/users/{me['id']}", headers=admin, json={**own, "is_active": True, "role": "senior"}).status_code == 400
+
+    # locations: add, change, delete; one with inspections cannot be deleted
+    halt = {"name": "Zz Test Halt", "kind": "station", "division": "Jaipur", "latitude": 26.8, "longitude": 75.8}
+    assert client.post("/admin/locations", headers=admin, json={**halt, "latitude": 126.8}).status_code == 400
+    loc = client.post("/admin/locations", headers=admin, json=halt).json()
+    changed = client.put(f"/admin/locations/{loc['id']}", headers=admin, json={**halt, "kind": "depot"})
+    assert changed.json()["kind"] == "depot"
+    assert client.delete(f"/admin/locations/{loc['id']}", headers=admin).status_code == 204
+    used = client.get("/inspections", headers=admin).json()[0]["location"]["id"]
+    assert client.delete(f"/admin/locations/{used}", headers=admin).status_code == 400
+
+    # only the admin can use these screens
+    for other in ("senior", "officer", "staff_elec"):
+        assert client.get("/admin/users", headers=login(other)).status_code == 403
+    assert client.post("/admin/departments", headers=login("senior"), json={"code": "NEW", "name": "New"}).status_code == 403
+
+
 def test_roles_are_enforced():
     staff = login("staff_engg")
     assert client.post("/inspections", headers=staff, json={"location_id": 1, "inspection_type": "station"}).status_code == 403

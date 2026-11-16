@@ -48,7 +48,7 @@ def current_user(
     except jwt.PyJWTError:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid or expired token")
     user = db.get(User, int(payload["sub"]))
-    if user is None:
+    if user is None or not user.is_active:   # an account the admin switched off stops working at once
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "User not found")
     return user
 

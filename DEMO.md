@@ -18,7 +18,7 @@ Expected output: `Demo data ready: 10 inspections, 28 observations with photos.`
 `--reset` wipes all inspections and tasks and creates them again with dates relative to today, so
 run it again any time you have clicked around and want a clean start. Users and stations are kept.
 
-Optional check that the backend is healthy: `.venv\Scripts\python -m pytest -q` should say `6 passed`.
+Optional check that the backend is healthy: `.venv\Scripts\python -m pytest -q` should say `7 passed`.
 
 ## 2. Start everything (two PowerShell windows)
 
@@ -103,6 +103,20 @@ each photo. If you block it, everything still works, but the AI check will say "
 
 If you are short on time, stop after Part C step 2: the loop from officer to staff to senior officer is complete there.
 
+### Part D, only if asked: Administrator (about 1 minute)
+
+1. Log out, then sign in as `admin` / `demo123`. It is the same dashboard with one more tab, **Admin**.
+2. Click **Admin**. Three lists: **Users**, **Departments**, **Locations**.
+3. Click **Add user**. Fill in a username such as `staff_kota`, a name, role **Department staff**, department
+   **Electrical** and a password of 6 characters or more, then **Add user**. "This person can now sign in and
+   sees only Electrical points."
+4. Untick **This account can sign in** and click **Save changes**. The row shows "Switched off".
+   "Accounts are switched off, not deleted, so old inspections keep the right names."
+5. Click **Locations**, then **Add location** to show the form (name, type, division, position for the map).
+   "A location that already has inspections cannot be deleted."
+
+A user you add stays after `--reset`, because the reset only clears inspections and points.
+
 ## 4. What is real and what is a placeholder (if asked in the viva)
 
 | Part | Today |
@@ -111,6 +125,7 @@ If you are short on time, stop after Part C step 2: the loop from officer to sta
 | Department routing | Working baseline: keyword rules (`backend/app/services/ai.py`); trained classifier planned for sprint 5 (04 – 24 Jan 2027) |
 | Inspection note | Working template; local LLM (Ollama, Qwen 2.5 3B) planned for sprint 5 (04 – 24 Jan 2027) |
 | Fix check | GPS distance check works; before/after image comparison planned for sprint 5 (04 – 24 Jan 2027) |
+| Admin screens (users, departments, locations) | Working (`backend/app/routers/admin.py`, `dashboard/src/pages/Admin.jsx`) |
 | PDF of the inspection note | Working (`backend/app/services/pdf.py`); Hindi text is not printed yet |
 | Overdue check and escalation | Working (`backend/app/services/escalation.py`); reminder emails are written but switched off until an email account is set in `backend/.env` |
 | Photo defect detection (YOLOv8) | Not trained yet (sprint 4, 14 Dec 2026 – 03 Jan 2027); the API returns no defects |
@@ -124,10 +139,11 @@ All dashboard code is in `dashboard/src/`:
 
 | File | What it does |
 |---|---|
-| `App.jsx` | Top bar with the three tabs, loads the data once, decides which page shows |
+| `App.jsx` | Top bar with the tabs (a fourth, Admin, for the admin account), loads the data once, decides which page shows |
 | `pages/Overview.jsx` | Headline, summary strip, department chart, map, longest overdue, latest inspections |
 | `pages/Points.jsx` | Compliance points: status tabs, search and filters, list on the left, details with Accept / Reject on the right |
 | `pages/Inspections.jsx` | Inspection list, the inspection note and the points it raised |
+| `pages/Admin.jsx` | Admin only: lists and forms for users, departments and locations |
 | `pages/Login.jsx` | Sign-in page (the role from the login decides which screens open) |
 | `pages/field/FieldApp.jsx` | Frame for the officer and staff screens: top bar, messages |
 | `pages/field/Officer.jsx` | Officer: my inspections, new inspection with checklist, observations, generate note, approve |

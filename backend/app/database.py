@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 from .config import settings
@@ -39,6 +39,18 @@ SessionLocal = sessionmaker(bind=engine, autoflush=False, expire_on_commit=False
 
 class Base(DeclarativeBase):
     pass
+
+
+def ensure_schema() -> None:
+    """Create the tables that are missing, and add the columns that were added to models.py after
+    a database was first made. (A small stand-in for migrations: use Alembic once the schema settles.)"""
+    from . import models  # noqa: F401  (makes sure every table is known before create_all)
+
+    Base.metadata.create_all(bind=engine)
+    with engine.begin() as conn:
+        user_columns = {c["name"] for c in inspect(conn).get_columns("users")}
+        if "is_active" not in user_columns:
+            conn.execute(text("ALTER TABLE users ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT TRUE"))
 
 
 def get_db():
