@@ -330,6 +330,8 @@ select.input { max-width: 230px; }
 .sheet li { padding-left: 4px; }
 .sheet li .tag { margin-left: 8px; }
 .sheet-missing { padding: 14px 16px; border: 1px dashed #c3cbd9; border-radius: 6px; }
+.sheet-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.panel-head-actions { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
 
 /* ------------------------------------------- field screens (officer and staff) */
 /* one narrow column: a phone screen on a phone, a phone-sized column on a laptop */

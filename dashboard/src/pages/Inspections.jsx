@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from "react";
-import { ChecklistSummary, Empty, Photo, Status, TaskStatus } from "../components/ui.jsx";
+import { ChecklistSummary, Empty, PdfButton, Photo, Status, TaskStatus } from "../components/ui.jsx";
 import { fmtDate, inspectionTitle, plural } from "../format.js";
 
 const isWide = () => window.matchMedia("(min-width: 1000px)").matches;
@@ -179,7 +179,10 @@ function InspectionDetail({ insp, taskByObservation, openPoints, onBack }) {
       <ChecklistSummary inspection={insp} />
 
       {insp.note_text ? (
-        <NoteSheet text={insp.note_text} />
+        <>
+          <NoteSheet text={insp.note_text} />
+          <PdfButton inspection={insp} />
+        </>
       ) : (
         <p className="quiet sheet-missing">The officer has not generated the inspection note yet.</p>
       )}

@@ -18,7 +18,7 @@ Expected output: `Demo data ready: 10 inspections, 28 observations with photos.`
 `--reset` wipes all inspections and tasks and creates them again with dates relative to today, so
 run it again any time you have clicked around and want a clean start. Users and stations are kept.
 
-Optional check that the backend is healthy: `.venv\Scripts\python -m pytest -q` should say `4 passed`.
+Optional check that the backend is healthy: `.venv\Scripts\python -m pytest -q` should say `6 passed`.
 
 ## 2. Start everything (two PowerShell windows)
 
@@ -91,8 +91,14 @@ each photo. If you block it, everything still works, but the AI check will say "
 3. Click the row "Road surface cracked and waterlogged near gate lodge wall". **AI check: Doubtful**, because the fix
    photo was taken 1.1 km from the spot. Click **Reject fix**, type a reason such as `Send a photo from the gate`,
    click **Reject fix** again. The point goes back to the department at escalation level 1.
-4. Click the **Inspections** tab and then **Jaipur Junction** (16 Nov): the note the officer approved a minute ago,
-   with its three points and their current status.
+4. Click the **Inspections** tab and then **Jaipur Junction** (today's date): the note the officer approved a
+   minute ago, with its three points and their current status.
+5. Click **Download PDF** under the note. Open the file: the note as a document, with each point's department,
+   status and photos. "This is what goes on file or to the department by email."
+6. Optional: go back to **Overview** and click **Check overdue points** above the overdue list. The message says
+   "1 point moved to a higher escalation level; email reminders are switched off." "This check runs by itself
+   every hour. A point goes up a level when the deadline passes, at 3 days and at 7 days, and the department
+   gets an email each time."
    Finish: "One point, three users, and nothing is closed without photo proof."
 
 If you are short on time, stop after Part C step 2: the loop from officer to staff to senior officer is complete there.
@@ -105,6 +111,8 @@ If you are short on time, stop after Part C step 2: the loop from officer to sta
 | Department routing | Working baseline: keyword rules (`backend/app/services/ai.py`); trained classifier planned for sprint 5 (04 – 24 Jan 2027) |
 | Inspection note | Working template; local LLM (Ollama, Qwen 2.5 3B) planned for sprint 5 (04 – 24 Jan 2027) |
 | Fix check | GPS distance check works; before/after image comparison planned for sprint 5 (04 – 24 Jan 2027) |
+| PDF of the inspection note | Working (`backend/app/services/pdf.py`); Hindi text is not printed yet |
+| Overdue check and escalation | Working (`backend/app/services/escalation.py`); reminder emails are written but switched off until an email account is set in `backend/.env` |
 | Photo defect detection (YOLOv8) | Not trained yet (sprint 4, 14 Dec 2026 – 03 Jan 2027); the API returns no defects |
 | Demo photos | Generated placeholder images, clearly labelled, not real station photos |
 | Officer and staff screens | Working in the browser, laid out for a phone. Photo upload and GPS work; offline mode and voice notes are not built yet |
@@ -136,7 +144,7 @@ All dashboard code is in `dashboard/src/`:
 The dashboard reads three backend endpoints (`/dashboard/summary`, `/tasks`, `/inspections`) and calls
 `/tasks/{id}/close` or `/tasks/{id}/reject` for Accept and Reject. The officer screens call `/inspections` (create,
 add observation, change department, generate note, approve) and the staff screens call `/tasks/{id}/fix`.
-The backend was not changed for any of these screens.
+**Download PDF** calls `/inspections/{id}/note.pdf` and **Check overdue points** calls `/tasks/run-escalation`.
 
 ## 6. If something goes wrong
 

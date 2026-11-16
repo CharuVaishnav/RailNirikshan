@@ -75,6 +75,27 @@ export function apiForm(path, fields, photo) {
   return request(path, { method: "POST", headers: {}, body: form });
 }
 
+// Fetch a file that needs the login token (the note PDF) and hand it to the browser to save.
+export async function downloadFile(path, filename) {
+  let res;
+  try {
+    res = await fetch(`/api${path}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+  } catch {
+    throw new Error(UNREACHABLE);
+  }
+  if (!res.ok) {
+    throw new Error(res.status === 401 ? "Your session has ended. Sign in again." : "Could not make the PDF. Try again.");
+  }
+  const url = URL.createObjectURL(await res.blob());
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+}
+
 // Photos need the token too, so fetch each one once as a blob and reuse its object URL.
 const photoCache = new Map();
 

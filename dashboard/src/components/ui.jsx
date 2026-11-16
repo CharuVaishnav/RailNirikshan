@@ -1,6 +1,6 @@
 // Small building blocks shared by all pages.
 import { useEffect, useState } from "react";
-import { photoUrl } from "../api.js";
+import { downloadFile, photoUrl } from "../api.js";
 import { checklistResult } from "../checklists/index.js";
 import { TASK_STATUS, deadlineInfo } from "../format.js";
 
@@ -103,6 +103,33 @@ export function ChecklistSummary({ inspection }) {
           ))}
         </ul>
       )}
+    </div>
+  );
+}
+
+// Saves the inspection note as a PDF file: details, checklist, note, and every point with its photos.
+export function PdfButton({ inspection }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  async function download() {
+    setBusy(true);
+    setError("");
+    try {
+      const place = inspection.location.name.replace(/[^A-Za-z0-9]+/g, "_").replace(/^_|_$/g, "");
+      await downloadFile(`/inspections/${inspection.id}/note.pdf`, `Inspection_note_${inspection.id}_${place}.pdf`);
+    } catch (err) {
+      setError(err.message);
+    }
+    setBusy(false);
+  }
+
+  return (
+    <div className="sheet-actions">
+      <button type="button" className="btn btn-plain" onClick={download} disabled={busy}>
+        {busy ? "Preparing PDF" : "Download PDF"}
+      </button>
+      {error && <span className="form-error" role="alert">{error}</span>}
     </div>
   );
 }

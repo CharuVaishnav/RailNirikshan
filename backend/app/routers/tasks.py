@@ -9,7 +9,7 @@ from ..database import get_db
 from ..models import ComplianceTask, Inspection, Observation, TaskUpdate, User
 from ..schemas import DecisionIn, TaskOut
 from ..security import current_user, require_roles
-from ..services import ai, notify, storage
+from ..services import ai, escalation, storage
 
 router = APIRouter(prefix="/tasks", tags=["compliance tasks"])
 
@@ -114,23 +114,7 @@ def reject_fix(task_id: int, body: DecisionIn, db: Session = Depends(get_db),
 
 @router.post("/run-escalation")
 def run_escalation(db: Session = Depends(get_db), user: User = Depends(require_roles("admin", "senior"))):
-    """Raise the escalation level of every overdue open task.
-    Week 4: call this every hour (Windows Task Scheduler, cron, or a loop script) to send free email alerts.
-    """
-    overdue = db.scalars(select(ComplianceTask).where(
-        ComplianceTask.status == "open", ComplianceTask.deadline < datetime.utcnow())).all()
-    emailed = 0
-    for t in overdue:
-        t.escalation_level += 1
-        audit.log(db, user.id, "escalate", "task", t.id)
-        staff = db.scalars(select(User).where(User.role == "staff", User.department_id == t.department_id,
-                                              User.email.is_not(None))).all()
-        for u in staff:
-            emailed += notify.send_email(
-                u.email,
-                f"RailNirikshan: point #{t.id} is overdue (level {t.escalation_level})",
-                f"Inspection point #{t.id} was due on {t.deadline:%d %b %Y} and is still open.\n\n"
-                f"{t.observation.text}\n\nPlease fix it and upload an after-photo in the app.",
-            )
-    db.commit()
-    return {"escalated": len(overdue), "emails_sent": emailed}
+    """Check overdue points now: raise the escalation level of those due for their next step
+    and email the department. The same check runs every hour through `python -m app.escalate`.
+    The rules are in services/escalation.py."""
+    return escalation.run(db, user.id)

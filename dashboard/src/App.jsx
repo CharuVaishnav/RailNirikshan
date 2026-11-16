@@ -136,7 +136,8 @@ function Shell({ onLogout }) {
         )}
         {!data && !error && <p className="loading">Loading inspections and points</p>}
         {data && view === "overview" && (
-          <Overview data={data} openPoints={openPoints} openInspection={openInspection} />
+          <Overview data={data} openPoints={openPoints} openInspection={openInspection}
+                    onChanged={load} notify={notify} />
         )}
         {data && view === "points" && (
           <Points tasks={data.tasks} filter={pointsFilter} setFilter={setPointsFilter}

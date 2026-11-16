@@ -9,3 +9,4 @@ PyJWT==2.10.1
 httpx==0.28.1
 pytest==8.3.4
 Pillow>=11.0   # demo placeholder photos (app/demo_seed.py); also needed later for YOLO
+fpdf2==2.9.0   # inspection note as a PDF (app/services/pdf.py)

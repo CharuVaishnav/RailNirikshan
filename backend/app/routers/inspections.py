@@ -11,7 +11,7 @@ from ..database import get_db
 from ..models import ComplianceTask, Department, Inspection, Location, Observation, User
 from ..schemas import InspectionCreate, InspectionOut, NoteUpdate, ObservationOut, RoutingOverride
 from ..security import current_user, require_roles
-from ..services import ai, storage
+from ..services import ai, pdf, storage
 
 router = APIRouter(prefix="/inspections", tags=["inspections"])
 
@@ -168,6 +168,19 @@ def approve(inspection_id: int, db: Session = Depends(get_db),
     db.commit()
     db.refresh(insp)
     return insp
+
+
+@router.get("/{inspection_id}/note.pdf")
+def note_pdf(inspection_id: int, db: Session = Depends(get_db), user: User = Depends(current_user)):
+    """The inspection note as a PDF file: details, checklist, note, and every point with its photos."""
+    insp = _get_own_inspection(db, inspection_id, user)
+    obs_ids = [o.id for o in insp.observations]
+    tasks = db.scalars(select(ComplianceTask).where(ComplianceTask.observation_id.in_(obs_ids))).all() if obs_ids else []
+    data = pdf.build_note_pdf(insp, {t.observation_id: t for t in tasks}, storage.load_photo)
+    audit.log(db, user.id, "export_pdf", "inspection", insp.id)
+    db.commit()
+    return Response(data, media_type="application/pdf",
+                    headers={"Content-Disposition": f'attachment; filename="inspection_note_{insp.id}.pdf"'})
 
 
 @router.get("/photos/{key}")

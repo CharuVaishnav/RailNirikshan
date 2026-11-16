@@ -50,7 +50,7 @@ python -m venv .venv
 .venv\Scripts\python -m pip install -r requirements.txt     # Linux/macOS: .venv/bin/python
 copy .env.example .env                                       # Linux/macOS: cp
 .venv\Scripts\python -m app.demo_seed --reset                # users, stations and realistic demo data
-.venv\Scripts\python -m pytest -q                            # should say "4 passed"
+.venv\Scripts\python -m pytest -q                            # should say "6 passed"
 ```
 
 Start it (every time):
@@ -99,11 +99,28 @@ ollama pull qwen2.5:3b      # about 2 GB, runs on a normal CPU; on a slow laptop
 
 Set `OLLAMA_URL=http://localhost:11434` in `backend/.env`. Until then, notes use a simple template.
 
-### 5. Free email alerts (sprint 3)
+### 5. Overdue check and free email alerts
 
-In `backend/.env`, set `SMTP_USER` and `SMTP_PASSWORD` (for Gmail: turn on 2-step verification and create an
-app password). Give staff users an email address, then call `POST /tasks/run-escalation` every hour
-(Windows Task Scheduler or cron). Overdue points are escalated and the department staff get an email.
+A point that is still open after its deadline is escalated one step at a time (rules in
+`backend/app/services/escalation.py`): when the deadline passes, at 3 days overdue, and at 7 days overdue.
+Each step raises its escalation level and emails the department's staff; at the last step the senior officers
+get the email too. Run the check by hand from the backend folder:
+
+```bash
+.venv\Scripts\python -m app.escalate
+```
+
+It is safe to run as often as you like, because no step happens twice. The senior officer can also start it
+with **Check overdue points** on the overview. To run it every hour on Windows (once, in a terminal; replace
+the folder):
+
+```bash
+schtasks /Create /SC HOURLY /TN "RailNirikshan overdue check" /TR "cmd /c cd /d C:\path\to\RailNirikshan\backend && .venv\Scripts\python -m app.escalate"
+```
+
+Emails are off until you set `SMTP_USER` and `SMTP_PASSWORD` in `backend/.env` (for Gmail: turn on 2-step
+verification and create an app password) and give the staff and senior users an email address. Without them
+the levels still go up; only the emails are skipped.
 
 ### 6. PostgreSQL for deployment (sprint 6)
 
@@ -148,7 +165,8 @@ with demo data.
 | Fix check | GPS distance works; before / after photo comparison in sprint 5 |
 | Photo defect detection (YOLOv8) | Sprint 4; no trained model yet |
 | Voice to text | Sprint 5 |
-| Email alerts on a schedule, PDF export of the note | Sprint 3 |
+| PDF export of the inspection note, with before / after photos | Working (Hindi text is not printed yet) |
+| Overdue check: escalation in steps, reminder emails | Working; emails need an SMTP account in `backend/.env` |
 | Admin screens for users, departments and locations | Not built; master data comes from the seed scripts |
 | Offline mode, repeated-issue finder | Only if time permits |
 

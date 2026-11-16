@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { api, apiForm } from "../../api.js";
 import { CHECKLISTS, checklistResult } from "../../checklists/index.js";
-import { ChecklistSummary, Empty, Photo, Status, TaskStatus } from "../../components/ui.jsx";
+import { ChecklistSummary, Empty, PdfButton, Photo, Status, TaskStatus } from "../../components/ui.jsx";
 import { usePosition } from "../../device.js";
 import { INSPECTION_TYPE, deadlineInfo, fmtDate, inspectionTitle, plural } from "../../format.js";
 import { Meter, NoteSheet, progress } from "../Inspections.jsx";
@@ -328,7 +328,12 @@ function InspectionScreen({ id, onBack, notify, onError }) {
       {error && <p className="notice" role="alert">{error}</p>}
       <ChecklistSummary inspection={insp} />
 
-      {!draft && insp.note_text && <NoteSheet text={insp.note_text} />}
+      {!draft && insp.note_text && (
+        <>
+          <NoteSheet text={insp.note_text} />
+          <PdfButton inspection={insp} />
+        </>
+      )}
 
       <section className="panel">
         <header className="panel-head">

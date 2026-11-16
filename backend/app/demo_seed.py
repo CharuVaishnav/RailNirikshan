@@ -19,11 +19,12 @@ from datetime import datetime, timedelta
 from PIL import Image, ImageDraw, ImageFont
 from sqlalchemy import delete, func, select
 
+from . import audit
 from .config import settings
 from .database import Base, SessionLocal, engine
 from .models import AuditLog, ComplianceTask, Department, Inspection, Location, Observation, TaskUpdate, User
 from .seed import seed
-from .services import ai, storage
+from .services import ai, escalation, storage
 
 # Extra NWR stations so the map has more points (approximate coordinates).
 EXTRA_LOCATIONS = [
@@ -263,7 +264,11 @@ def demo_seed(do_reset: bool = False) -> None:
                     db.add(TaskUpdate(task_id=task.id, user_id=senior.id, created_at=fixed_at,
                                       remark="Fix rejected: water still standing, clean the drain fully"))
                 elif state == "open" and overdue:
-                    task.escalation_level = 2 if days_ago >= 10 else 1   # as if the escalation job already ran
+                    # As if the escalation check last ran a day ago (services/escalation.py), so that
+                    # "Check overdue points" in the demo finds one point that is due for its next step.
+                    task.escalation_level = escalation.steps_due(task.deadline, now - timedelta(days=1))
+                    for _ in range(task.escalation_level):
+                        audit.log(db, None, "escalate", "task", task.id)
 
                 label = "overdue (not closed)" if overdue and task.status != "closed" else None
                 counts[task.status] = counts.get(task.status, 0) + 1

@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { api } from "../api.js";
 import StationMap from "../components/StationMap.jsx";
 import { Empty, PointRow, Status } from "../components/ui.jsx";
 import { fmtDate, inspectionTitle, parseUtc, plural } from "../format.js";
@@ -22,8 +23,9 @@ function Figure({ label, value, tone, onClick }) {
   );
 }
 
-export default function Overview({ data, openPoints, openInspection }) {
+export default function Overview({ data, openPoints, openInspection, onChanged, notify }) {
   const { summary, tasks, inspections } = data;
+  const [checking, setChecking] = useState(false);
   const byStatus = summary.tasks_by_status || {};
   const review = byStatus.fix_submitted || 0;
   const open = byStatus.open || 0;
@@ -71,6 +73,22 @@ export default function Overview({ data, openPoints, openInspection }) {
     action = { label: "See overdue points", go: () => openPoints({ status: "overdue" }) };
   } else if (open > 0) {
     headline = `${plural(open, "point is", "points are")} with departments, none overdue`;
+  }
+
+  // Run the overdue check now. The same check runs by itself every hour (backend: python -m app.escalate).
+  async function checkOverdue() {
+    setChecking(true);
+    try {
+      const r = await api("/tasks/run-escalation", { method: "POST" });
+      const emails = r.email_on ? `${plural(r.emails_sent, "reminder email")} sent` : "email reminders are switched off";
+      notify(r.escalated > 0
+        ? `${plural(r.escalated, "point")} moved to a higher escalation level; ${emails}.`
+        : "No point is due for a higher escalation level yet.");
+      if (r.escalated > 0) await onChanged();
+    } catch (err) {
+      notify(err.message);
+    }
+    setChecking(false);
   }
 
   const today = new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
@@ -143,11 +161,19 @@ export default function Overview({ data, openPoints, openInspection }) {
         <section className="panel">
           <header className="panel-head panel-head-row">
             <h2>Longest overdue</h2>
-            {overdue > worstOverdue.length && (
-              <button type="button" className="btn btn-quiet" onClick={() => openPoints({ status: "overdue" })}>
-                See all {overdue}
-              </button>
-            )}
+            <span className="panel-head-actions">
+              {overdue > 0 && (
+                <button type="button" className="btn btn-quiet" onClick={checkOverdue} disabled={checking}
+                        title="Raises the escalation level of overdue points that are due for it and emails the department. This also runs by itself every hour.">
+                  {checking ? "Checking" : "Check overdue points"}
+                </button>
+              )}
+              {overdue > worstOverdue.length && (
+                <button type="button" className="btn btn-quiet" onClick={() => openPoints({ status: "overdue" })}>
+                  See all {overdue}
+                </button>
+              )}
+            </span>
           </header>
           {worstOverdue.length === 0 ? (
             <Empty title="No overdue points">Departments are within their deadlines.</Empty>
