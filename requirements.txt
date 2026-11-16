@@ -1,0 +1,12 @@
+# Used only by Vercel (the online copy) to install what api/index.py needs.
+# On the laptop use backend/requirements.txt, which also has the test and server tools.
+# Keep the versions here the same as in backend/requirements.txt.
+fastapi==0.115.6
+sqlalchemy==2.0.36
+psycopg[binary]==3.2.3
+pydantic==2.10.3
+pydantic-settings==2.6.1
+python-multipart==0.0.19
+PyJWT==2.10.1
+httpx==0.28.1
+Pillow>=11.0

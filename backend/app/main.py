@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from .config import settings
 from .database import Base, engine
 from .routers import auth, dashboard, inspections, tasks
 
@@ -32,7 +33,8 @@ app.add_middleware(
 
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    # "database" and "photos" show where data is kept: useful to check the online copy is set up properly.
+    return {"status": "ok", "database": engine.dialect.name, "photos": settings.storage_backend}
 
 
 app.include_router(auth.router)

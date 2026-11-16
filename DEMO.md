@@ -18,7 +18,7 @@ Expected output: `Demo data ready: 10 inspections, 28 observations with photos.`
 `--reset` wipes all inspections and tasks and creates them again with dates relative to today, so
 run it again any time you have clicked around and want a clean start. Users and stations are kept.
 
-Optional check that the backend is healthy: `.venv\Scripts\python -m pytest -q` should say `3 passed`.
+Optional check that the backend is healthy: `.venv\Scripts\python -m pytest -q` should say `4 passed`.
 
 ## 2. Start everything (two PowerShell windows)
 

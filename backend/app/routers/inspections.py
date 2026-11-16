@@ -69,7 +69,7 @@ async def add_observation(
     photo_key, defects = None, []
     if photo is not None:
         data = await photo.read()
-        photo_key = storage.save_photo(data, photo.filename)
+        photo_key = storage.save_photo(data, photo.filename, db)
         defects = ai.detect_defects(data)
     dept_code = ai.route_department(text)
     dept = db.scalar(select(Department).where(Department.code == dept_code)) if dept_code else None
@@ -96,7 +96,7 @@ def delete_observation(inspection_id: int, obs_id: int, db: Session = Depends(ge
     if obs is None or obs.inspection_id != inspection_id:
         raise HTTPException(404, "Observation not found")
     if obs.photo_key:
-        storage.delete_photo(obs.photo_key)
+        storage.delete_photo(obs.photo_key, db)
     db.delete(obs)
     insp.note_text = ""
     audit.log(db, user.id, "delete_observation", "observation", obs_id)

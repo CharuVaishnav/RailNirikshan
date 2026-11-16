@@ -1,7 +1,7 @@
 """Database tables for RailNirikshan."""
 from datetime import datetime
 
-from sqlalchemy import JSON, DateTime, Float, ForeignKey, Integer, String, Text
+from sqlalchemy import JSON, DateTime, Float, ForeignKey, Integer, LargeBinary, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .database import Base
@@ -106,6 +106,14 @@ class TaskUpdate(Base):
 
     task: Mapped[ComplianceTask] = relationship(back_populates="updates")
     user: Mapped[User] = relationship()
+
+
+class StoredPhoto(Base):
+    """A photo kept inside the database. Used only when STORAGE_BACKEND=db,
+    which is how the online copy on Vercel works (it has no permanent disk)."""
+    __tablename__ = "stored_photos"
+    key: Mapped[str] = mapped_column(String(300), primary_key=True)
+    data: Mapped[bytes] = mapped_column(LargeBinary)
 
 
 class AuditLog(Base):

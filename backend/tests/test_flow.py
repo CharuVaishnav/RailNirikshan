@@ -101,6 +101,28 @@ def test_officer_can_remove_an_observation_from_a_draft():
     assert client.delete(f"{base}/observations/{keep['id']}", headers=officer).status_code == 400
 
 
+def test_photos_can_be_kept_in_the_database(monkeypatch):
+    """The online copy (Vercel) has no disk, so photos go into the database: STORAGE_BACKEND=db."""
+    from app.config import settings
+
+    monkeypatch.setattr(settings, "storage_backend", "db")
+    assert client.get("/health").json()["photos"] == "db"
+
+    officer = login("officer")
+    loc = client.get("/locations", headers=officer).json()[0]
+    insp = client.post("/inspections", headers=officer,
+                       json={"location_id": loc["id"], "inspection_type": "station", "checklist": {}}).json()
+    base = f"/inspections/{insp['id']}"
+    obs = client.post(f"{base}/observations", headers=officer, data={"text": "Tube light fused on platform 2"},
+                      files={"photo": ("p.jpg", b"photo-kept-in-database", "image/jpeg")}).json()
+
+    photo = client.get(f"/inspections/photos/{obs['photo_key']}", headers=officer)
+    assert photo.status_code == 200 and photo.content == b"photo-kept-in-database"
+
+    assert client.delete(f"{base}/observations/{obs['id']}", headers=officer).status_code == 204
+    assert client.get(f"/inspections/photos/{obs['photo_key']}", headers=officer).status_code == 404
+
+
 def test_roles_are_enforced():
     staff = login("staff_engg")
     assert client.post("/inspections", headers=staff, json={"location_id": 1, "inspection_type": "station"}).status_code == 403

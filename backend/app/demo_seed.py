@@ -15,7 +15,6 @@ same AI routing function the app uses (services/ai.py), and notes come from gene
 import io
 import sys
 from datetime import datetime, timedelta
-from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 from sqlalchemy import delete, func, select
@@ -24,7 +23,7 @@ from .config import settings
 from .database import Base, SessionLocal, engine
 from .models import AuditLog, ComplianceTask, Department, Inspection, Location, Observation, TaskUpdate, User
 from .seed import seed
-from .services import ai
+from .services import ai, storage
 
 # Extra NWR stations so the map has more points (approximate coordinates).
 EXTRA_LOCATIONS = [
@@ -130,7 +129,7 @@ def _font(size: int):
             return ImageFont.truetype(name, size)
         except OSError:
             continue
-    return ImageFont.load_default()
+    return ImageFont.load_default(size)   # no system font (for example on Vercel): Pillow's built-in font
 
 
 def _wrap(text: str, width: int = 44) -> list[str]:
@@ -175,21 +174,12 @@ def make_photo(kind: str, text: str, place: str, when: datetime, dept_code: str)
     return buf.getvalue()
 
 
-def save_demo_photo(name: str, data: bytes) -> str:
-    folder = Path(settings.local_upload_dir)
-    folder.mkdir(parents=True, exist_ok=True)
-    key = f"demo_{name}.jpg"
-    (folder / key).write_bytes(data)
-    return key
-
-
 def reset(db) -> None:
     """Delete all inspections, tasks and demo photos. Users, departments and locations stay."""
     for model in (TaskUpdate, ComplianceTask, Observation, Inspection, AuditLog):
         db.execute(delete(model))
+    storage.delete_demo_photos(db)
     db.commit()
-    for f in Path(settings.local_upload_dir).glob("demo_*.jpg"):
-        f.unlink()
 
 
 def demo_seed(do_reset: bool = False) -> None:
@@ -235,7 +225,8 @@ def demo_seed(do_reset: bool = False) -> None:
                 dept = depts[code]
                 lat, lon = loc.latitude + 0.0002 * (i + 1), loc.longitude + 0.0001 * (i + 1)
                 seen_at = created + timedelta(minutes=10 * (i + 1))
-                before_key = save_demo_photo(f"{n_obs:02d}_before", make_photo("BEFORE", text, loc.name, seen_at, code))
+                before_key = storage.save_photo(make_photo("BEFORE", text, loc.name, seen_at, code), "",
+                                                db, key=f"demo_{n_obs:02d}_before.jpg")
                 obs = Observation(inspection_id=insp.id, text=text, photo_key=before_key, latitude=lat, longitude=lon,
                                   ai_defects=[], suggested_department_id=dept.id, created_at=seen_at)
                 db.add(obs)
@@ -258,7 +249,8 @@ def demo_seed(do_reset: bool = False) -> None:
                     f_lat, f_lon = (lat + 0.01, lon) if state == "doubtful" else (lat + 0.00005, lon)
                     check = ai.verify_fix({"lat": lat, "lon": lon, "defects": []},
                                           {"lat": f_lat, "lon": f_lon, "defects": []})
-                    after_key = save_demo_photo(f"{n_obs:02d}_after", make_photo("AFTER", remark, loc.name, fixed_at, code))
+                    after_key = storage.save_photo(make_photo("AFTER", remark, loc.name, fixed_at, code), "",
+                                                   db, key=f"demo_{n_obs:02d}_after.jpg")
                     db.add(TaskUpdate(task_id=task.id, user_id=staff[dept.id].id, remark=remark, photo_key=after_key,
                                       latitude=f_lat, longitude=f_lon, verification=check,
                                       created_at=fixed_at - timedelta(hours=2)))

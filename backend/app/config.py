@@ -14,7 +14,8 @@ class Settings(BaseSettings):
     jwt_secret: str = "change-me-in-production"
     jwt_expiry_minutes: int = 60 * 12
 
-    # Photo storage: "local" (uploads folder on the server disk, free) or "minio" (optional)
+    # Photo storage: "local" (uploads folder on the server disk, free), "db" (inside the database,
+    # used by the online copy on Vercel) or "minio" (optional)
     storage_backend: str = "local"
     local_upload_dir: str = "uploads"
     minio_endpoint: str = "localhost:9000"

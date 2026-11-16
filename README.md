@@ -15,6 +15,8 @@ RailNirikshan/
 ├── ml/           Scripts for the AI models: defect detection, speech, notes, routing, verification (Python)
 ├── mobile/       Starter Flutter app. Not used: the officer and staff screens are now in dashboard/
 ├── srs_diagrams/ Diagrams used in the SRS
+├── api/          Entry point for the online copy on Vercel (hands /api requests to backend/)
+├── vercel.json, requirements.txt   Settings for Vercel only; not used on the laptop
 ├── DEMO.md       How to start everything and the click-by-click demo script
 └── docker-compose.yml   optional PostgreSQL for deployment
 ```
@@ -48,7 +50,7 @@ python -m venv .venv
 .venv\Scripts\python -m pip install -r requirements.txt     # Linux/macOS: .venv/bin/python
 copy .env.example .env                                       # Linux/macOS: cp
 .venv\Scripts\python -m app.demo_seed --reset                # users, stations and realistic demo data
-.venv\Scripts\python -m pytest -q                            # should say "3 passed"
+.venv\Scripts\python -m pytest -q                            # should say "4 passed"
 ```
 
 Start it (every time):
@@ -113,6 +115,25 @@ DATABASE_URL=postgresql+psycopg://rail:rail@localhost:5432/railnirikshan
 ```
 
 and run `python -m app.seed` again.
+
+### 7. Online copy on Vercel (free)
+
+The same code runs online on Vercel's free plan. The web app is served as plain files, and every `/api/...`
+request goes to `api/index.py`, which runs the same backend as on the laptop. Vercel has no permanent disk,
+so online the data goes into a free PostgreSQL database (Neon) and the photos are kept inside that database.
+
+1. On vercel.com sign in with GitHub, choose **Add New > Project** and import the `RailNirikshan` repository.
+   Change nothing (the settings come from `vercel.json`) and click **Deploy**.
+2. Open the project's **Storage** tab, choose **Create Database > Neon**, pick the free plan and connect it to
+   the project. This adds `DATABASE_URL` to the project by itself.
+3. Open **Deployments**, click the three dots on the latest one and choose **Redeploy**, so that it picks up
+   the database.
+4. Open `https://<your-project>.vercel.app/api/health`. It should say `"database": "postgresql"`.
+   If it says `"sqlite"`, the database is not connected yet and data will not be kept.
+
+The first visit loads the demo users and the 10 demo inspections by itself. Every later `git push` to `main`
+is deployed automatically. The online copy is public and uses the demo logins (`demo123`), so use it only
+with demo data.
 
 ## What works today and what is planned
 

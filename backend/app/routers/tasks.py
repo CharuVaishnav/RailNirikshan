@@ -66,7 +66,7 @@ async def submit_fix(
     photo_key, after_defects = None, []
     if photo is not None:
         data = await photo.read()
-        photo_key = storage.save_photo(data, photo.filename)
+        photo_key = storage.save_photo(data, photo.filename, db)
         after_defects = ai.detect_defects(data)
     obs = task.observation
     verification = ai.verify_fix(
