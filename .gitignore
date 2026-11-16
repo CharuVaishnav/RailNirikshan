@@ -24,6 +24,14 @@ ml/**/datasets/
 *.pt
 *.onnx
 
+# College documents: kept on the laptop only, not on the public repo
+RailNirikshan_SRS.docx
+RailNirikshan_SRS.pdf
+SRS_OUTLINE.md
+PROJECT_ABSTRACT_content.md
+FUNCTIONAL_REQUIREMENTS_content.md
+~$*.docx
+
 # OS / editors
 .DS_Store
 .idea/

@@ -19,8 +19,8 @@ RailNirikshan/
 └── docker-compose.yml   optional PostgreSQL for deployment
 ```
 
-College documents kept in this folder: `RailNirikshan_SRS.docx` / `.pdf`, `SRS_OUTLINE.md`,
-`PROJECT_ABSTRACT_content.md`, `FUNCTIONAL_REQUIREMENTS_content.md`.
+The college documents (SRS, project abstract, functional requirements) are kept on the developer's laptop and
+are not part of this repository.
 
 ## Cost: zero
 
@@ -140,7 +140,7 @@ Build the real models in `ml/` and swap them in one at a time (see `ml/README.md
 
 - Commit small changes and push to GitHub every day.
 - Run `pytest -q` before merging, and tag each milestone.
-- Follow the six sprints in `PROJECT_ABSTRACT_content.md` (20 Oct 2026 to 15 Feb 2027).
+- Follow the six sprints of the project plan (20 Oct 2026 to 15 Feb 2027).
 
 ## Important
 
