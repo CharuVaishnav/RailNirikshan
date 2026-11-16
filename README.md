@@ -120,14 +120,13 @@ and run `python -m app.seed` again.
 
 The same code runs online on Vercel's free plan. The web app is served as plain files, and every `/api/...`
 request goes to `api/index.py`, which runs the same backend as on the laptop. Vercel has no permanent disk,
-so online the data goes into a free PostgreSQL database (Supabase) and the photos are kept inside that database.
+so online the data goes into a free PostgreSQL database (Neon) and the photos are kept inside that database.
 
 1. On vercel.com sign in with GitHub, choose **Add New > Project** and import the `RailNirikshan` repository.
    Change nothing (the settings come from `vercel.json`) and click **Deploy**.
-2. Open the project's **Storage** tab, choose **Create Database > Supabase**, pick the free plan and connect it
-   to the project. This adds the database address (`POSTGRES_URL`) to the project by itself. Neon also works.
-   A free Supabase project is paused after one week without use: open it in the Supabase dashboard and resume
-   it before a demo.
+2. Open the project's **Storage** tab, choose **Create Database > Neon**, pick the free plan and connect it to
+   the project. This adds the database address (`DATABASE_URL`) to the project by itself. Supabase also works
+   (it adds `POSTGRES_URL`), but a free Supabase project is paused after one week without use.
 3. Open **Deployments**, click the three dots on the latest one and choose **Redeploy**, so that it picks up
    the database.
 4. Open `https://<your-project>.vercel.app/api/health`. It should say `"database": "postgresql"`.
