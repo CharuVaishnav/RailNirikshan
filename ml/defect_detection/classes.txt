@@ -1,0 +1,8 @@
+litter
+waterlogging
+broken_seating
+damaged_signage
+broken_light_fixture
+missing_fire_extinguisher
+damaged_floor_tile
+stained_wall

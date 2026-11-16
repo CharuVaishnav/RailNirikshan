@@ -1,0 +1,20 @@
+# Optional. You do NOT need Docker to build the project: the backend uses SQLite
+# and stores photos on disk by default (free, no setup).
+#
+#   docker compose up -d db     -> PostgreSQL, for deployment (week 9)
+#
+# Ollama is easier to install directly from ollama.com (Windows, Mac, Linux).
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: rail
+      POSTGRES_PASSWORD: rail
+      POSTGRES_DB: railnirikshan
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:

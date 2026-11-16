@@ -1,0 +1,15 @@
+{
+  "type": "lc_gate",
+  "title": "Level crossing gate inspection",
+  "note": "Draft checklist. Replace with the official NWR format once received.",
+  "items": [
+    {"id": "gate_operation", "label": "Gate opens and closes smoothly"},
+    {"id": "gate_lamp", "label": "Gate lamps and lighting working"},
+    {"id": "road_signs", "label": "Road warning signs present and visible"},
+    {"id": "road_surface", "label": "Road surface and approach in good condition"},
+    {"id": "telephone", "label": "Gate telephone / communication working"},
+    {"id": "records", "label": "Gate register maintained"},
+    {"id": "gateman", "label": "Gateman on duty with required equipment"},
+    {"id": "visibility", "label": "Clear visibility, no obstruction near track"}
+  ]
+}

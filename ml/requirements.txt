@@ -1,0 +1,9 @@
+# Install in a separate virtual environment (or use Google Colab for training).
+ultralytics==8.3.40          # YOLOv8 defect detection
+faster-whisper==1.1.0        # speech to text, fast on a normal CPU
+sentence-transformers==3.3.1 # text embeddings for repeat-issue finding
+scikit-learn==1.5.2          # routing classifier, HDBSCAN clustering
+pandas==2.2.3
+httpx==0.28.1                # calling Ollama
+Pillow==11.0.0
+ImageHash==4.3.1             # fix verification (image similarity)

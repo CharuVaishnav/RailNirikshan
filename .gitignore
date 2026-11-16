@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+backend/.env
+backend/*.db
+backend/uploads/
+
+# Node
+node_modules/
+dashboard/dist/
+
+# Flutter
+mobile/.dart_tool/
+mobile/build/
+mobile/.flutter-plugins*
+mobile/pubspec.lock
+
+# ML
+ml/**/runs/
+ml/**/datasets/
+*.pt
+*.onnx
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/

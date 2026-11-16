@@ -1,0 +1,29 @@
+text,department
+Two tube lights not working on foot over bridge,ELEC
+Ceiling fan in waiting hall not working,ELEC
+Platform lighting dim near coach indicator,ELEC
+Exposed wiring near ticket counter,ELEC
+Lift at platform 2 out of order,ELEC
+Water logging near platform end after rain,ENGG
+Roof leaking above platform 1 bench,ENGG
+Cracks in platform surface near stairs,ENGG
+Drain blocked behind station building,ENGG
+Broken floor tiles in concourse,ENGG
+Garbage near waiting hall entrance,COMM
+Dustbins overflowing on platform 3,COMM
+Drinking water booth dirty,COMM
+Enquiry counter unattended,COMM
+Platform not swept since morning,COMM
+Coach door not closing properly,MECH
+Berth cushion torn in coach S4,MECH
+Window shutter jammed in pantry car,MECH
+Train display board not working,SNT
+Public address system announcements not audible,SNT
+CCTV camera at entry not working,SNT
+LC gate telephone not working,SNT
+Food stall staff without gloves and caps,MED
+Rodents seen near food stall,MED
+First aid box missing at station master office,MED
+Fire extinguisher expired near parcel office,SEC
+Unauthorised vendors on platform,SEC
+Trespassing across tracks near platform 4,SEC

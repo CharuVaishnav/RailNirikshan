@@ -1,0 +1,18 @@
+# YOLO dataset config. Export your labelled photos from Label Studio in "YOLO" format
+# and arrange them like this:
+#   datasets/rail_defects/images/train/*.jpg   datasets/rail_defects/labels/train/*.txt
+#   datasets/rail_defects/images/val/*.jpg     datasets/rail_defects/labels/val/*.txt
+path: datasets/rail_defects
+train: images/train
+val: images/val
+
+# Keep this list in the same order as classes.txt (finalise it with the NWR mentor).
+names:
+  0: litter
+  1: waterlogging
+  2: broken_seating
+  3: damaged_signage
+  4: broken_light_fixture
+  5: missing_fire_extinguisher
+  6: damaged_floor_tile
+  7: stained_wall

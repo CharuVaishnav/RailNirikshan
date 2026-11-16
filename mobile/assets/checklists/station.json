@@ -1,0 +1,19 @@
+{
+  "type": "station",
+  "title": "Station inspection",
+  "note": "Draft checklist. Replace with the official NWR format once received.",
+  "items": [
+    {"id": "platform_clean", "label": "Platforms clean and free of litter"},
+    {"id": "waiting_hall", "label": "Waiting hall clean, seating in good condition"},
+    {"id": "toilets", "label": "Toilets clean and working"},
+    {"id": "drinking_water", "label": "Drinking water available and clean"},
+    {"id": "lighting", "label": "Platform and FOB lighting working"},
+    {"id": "fans", "label": "Fans working in waiting areas"},
+    {"id": "signage", "label": "Signage and display boards readable and working"},
+    {"id": "pa_system", "label": "Public address system working"},
+    {"id": "fire_safety", "label": "Fire extinguishers present and within validity"},
+    {"id": "drainage", "label": "No waterlogging, drains clear"},
+    {"id": "enquiry", "label": "Enquiry counter staffed"},
+    {"id": "first_aid", "label": "First aid box available"}
+  ]
+}

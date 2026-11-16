@@ -1,0 +1,14 @@
+{
+  "type": "coach",
+  "title": "Coach inspection",
+  "note": "Draft checklist. Replace with the official NWR format once received.",
+  "items": [
+    {"id": "coach_clean", "label": "Coach interior clean"},
+    {"id": "berths", "label": "Berths and seats in good condition"},
+    {"id": "doors_windows", "label": "Doors and windows working"},
+    {"id": "lights_fans", "label": "Lights and fans working"},
+    {"id": "toilets", "label": "Toilets clean, water available"},
+    {"id": "fire_safety", "label": "Fire extinguisher present"},
+    {"id": "emergency", "label": "Emergency alarm and signage in place"}
+  ]
+}
