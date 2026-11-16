@@ -7,8 +7,8 @@ FastAPI backend that runs on the laptop, so there is only one copy of the backen
 Three things are different online, and are set here before the backend is loaded:
 
 1. Database. Vercel has no permanent disk, so the SQLite file cannot be used. When a PostgreSQL
-   database is connected to the Vercel project (Storage tab), Vercel sets DATABASE_URL and the
-   backend uses it. Without one, a temporary SQLite file is used: the site opens, but data can
+   database (Supabase or Neon) is connected to the Vercel project (Storage tab), Vercel sets its
+   address as POSTGRES_URL or DATABASE_URL and the backend uses it. Without one, a temporary SQLite file is used: the site opens, but data can
    disappear at any time, so connect a database.
 2. Photos. They are kept inside the database instead of the uploads/ folder.
 3. Login secret. If JWT_SECRET is not set in Vercel, one is made from the database address, which
@@ -22,8 +22,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "backend"))
 
+# Neon names the database address DATABASE_URL; Supabase names it POSTGRES_URL.
 if not os.environ.get("DATABASE_URL"):
-    os.environ["DATABASE_URL"] = f"sqlite:///{Path(tempfile.gettempdir()) / 'railnirikshan.db'}"
+    os.environ["DATABASE_URL"] = (os.environ.get("POSTGRES_URL")
+                                  or f"sqlite:///{Path(tempfile.gettempdir()) / 'railnirikshan.db'}")
 os.environ.setdefault("STORAGE_BACKEND", "db")
 if not os.environ.get("JWT_SECRET"):
     os.environ["JWT_SECRET"] = hashlib.sha256(("jwt:" + os.environ["DATABASE_URL"]).encode()).hexdigest()
